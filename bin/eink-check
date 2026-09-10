@@ -50,7 +50,7 @@ for p in com.termux com.tailscale.ipn; do
 done
 
 echo "manual (GUI only) if anything above changed:"
-# Caps Lock -> Ctrl layout: no adb API; ~/bin/eink-capslock drives the Settings UI via uiautomator (takes the screen ~5-20 s).
+# Caps Lock -> Ctrl layout: no adb API; ~/bin/eink-capslock drives the Settings UI via uiautomator (takes the screen ~8 s).
 if [ -n "${EINK_SKIP_CAPSLOCK:-}" ]; then echo "  - Caps Lock layout: skipped (EINK_SKIP_CAPSLOCK set); run ~/bin/eink-capslock later"
 else echo "  - Caps Lock layout:"; ~/bin/eink-capslock 2>&1 | sed 's/^/      /'; fi
 echo "  - App Startup allowlist + Freeze settings: Settings > Apps & Notifications"

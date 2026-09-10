@@ -7,7 +7,7 @@
 # Screens: Physical keyboard page (row per keyboard, summary = current layout)
 #   -> tap row -> "Choose keyboard layout" dialog: enabled layouts (or "Default" when none) + "Set up keyboard layouts"
 #   -> setup picker: long alphabetical list of CheckBox rows (scrolls) -> tick the layout -> back -> it is current.
-# Tablet on USB. ~5-20 s of screen. EINK_LAYOUT="English (US)" selects another enabled layout (test);
+# Tablet on USB. ~10-15 s of screen (each uiautomator dump costs ~2 s of startup; animations are off, so no extra sleeps). EINK_LAYOUT="English (US)" selects another enabled layout (test);
 # EINK_UNTICK=1 unticks the layout in the picker instead (test only, reproduces the reverted state).
 set -u
 PKG=ris58h.exkeymo_keyboard_layout
@@ -15,7 +15,7 @@ KBD="${EINK_KBD:-Targus Folding Ergonomic Bluetooth Keyboard}"
 LAYOUT="${EINK_LAYOUT:-ExKeyMo}"
 T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
 N=0
-dump() { sleep "${1:-1.5}"; adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb pull /sdcard/ui.xml "$T/ui.xml" >/dev/null 2>&1
+dump() { sleep "${1:-0.2}"; adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb pull /sdcard/ui.xml "$T/ui.xml" >/dev/null 2>&1
   if [ -n "${EINK_DEBUG:-}" ]; then N=$((N+1)); cp "$T/ui.xml" "$EINK_DEBUG/dump$N.xml"; echo "[dump$N] $(python3 -c "
 import sys,xml.etree.ElementTree as ET;print(' | '.join((n.get('text') or '')[:30] for n in ET.parse(sys.argv[1]).iter('node') if n.get('text')))" "$T/ui.xml" | cut -c1-300)"; fi; }
 # q summary <kbd> | center <text> | present <text> | checkbox <text>  (checkbox -> "cx cy checked")
@@ -55,7 +55,7 @@ inpicker() { [ "$(q present 'Keyboard layouts')" = True ] && ! inchooser; }
 
 adb shell pm enable --user 0 $PKG >/dev/null; adb shell pm enable --user 0 $PKG >/dev/null
 adb shell am start --activity-clear-task -a android.settings.HARD_KEYBOARD_SETTINGS >/dev/null 2>&1
-dump 2; before=$(q summary "$KBD"); echo "layout before: ${before:-?}"
+dump 0.5; before=$(q summary "$KBD"); echo "layout before: ${before:-?}"
 [ -z "$before" ] && { echo "keyboard '$KBD' not listed (not connected?)"; back; exit 1; }
 if [ -z "${EINK_UNTICK:-}" ] && [[ "$before" == *"$LAYOUT"* ]]; then echo "already set"; back; exit 0; fi
 
@@ -74,7 +74,7 @@ for step in 1 2 3 4 5 6 7 8; do
   if inpicker; then
     for scroll in 1 2 3 4 5 6 7 8 9 10 11 12; do
       cb=$(q checkbox "$LAYOUT"); [ -n "$cb" ] && break
-      adb shell input swipe 1600 1900 1600 700 300; dump 0.8
+      adb shell input swipe 1600 1900 1600 700 300; dump 0.2
     done
     [ -z "$cb" ] && { echo "'$LAYOUT' not in picker (package disabled?)"; back; back; exit 1; }
     set -- $cb

@@ -15,7 +15,7 @@ Phone ──(Claude app, Remote Control)───▶ Laptop
 - **macOS:** `caffeinate -dimsu &` for a quick test; install Amphetamine (App Store) for a persistent, configurable version. Clamshell mode needs power connected.
 - **Linux:** in `/etc/systemd/logind.conf` set `HandleLidSwitch=ignore` and `HandleLidSwitchExternalPower=ignore`, then `sudo systemctl restart systemd-logind`.
 - Confirm Tailscale reconnects after a sleep/wake cycle: `tailscale status` from another device.
-- 2026-09-08: Matt reports lid-closed on power already stays awake without caffeinate/Amphetamine; nothing installed for this.
+- 2026-09-08: on this MacBook, lid-closed on power already stayed awake without caffeinate/Amphetamine; nothing installed for this.
 
 ### 1.2 SSH over Tailscale
 You already have Tailscale, so no port-forwarding or public keys on the internet.
@@ -195,7 +195,7 @@ Done this way on 2026-09-08: openssh installed, key `boox-notemax` generated and
 Chosen: **SuperMirror** (supermirror.app, $29 one-time after a 7-day trial, macOS 14+ Apple Silicon). USB only, uses adb, nothing to install on the Boox, mirror-only (no extended desktop). Set E Ink Center on the Boox to Speed mode while mirroring. Installed to /Applications (v2.4.10) on 2026-09-08; the dmg is also in `~/Downloads`. Free alternative if the latency is acceptable: Deskreen over Tailscale in the browser, but it needs a virtual display (BetterDisplay) on the Mac and is Wi-Fi only.
 
 ### 5.4 Open todos
-- Pair the Targus Bluetooth keyboard (deferred by Matt on 2026-09-08) (`adb shell am start -a android.settings.BLUETOOTH_SETTINGS`, then pair from the GUI).
+- Pair the Targus Bluetooth keyboard (deferred on 2026-09-08) (`adb shell am start -a android.settings.BLUETOOTH_SETTINGS`, then pair from the GUI).
 - Interactive cleanup of unused apps / background items (inventory via `adb shell pm list packages -3` and `ps -A`).
 - Battery: check `dumpsys batterystats` after a day of real use before disabling things blindly.
 
@@ -225,11 +225,11 @@ Two layers. herdr runs only on the laptop; the Boox is a thin SSH client.
 
 ### 5.9 Reading comfort on e-ink (2026-09-08)
 - **Claude Code animations:** `~/.claude/settings.json` now has `prefersReducedMotion: true` (no spinner/shimmer/flash) and `spinnerTipsEnabled: false`. `tui` was already `"fullscreen"`, which bounds redraws to the visible area. Streaming can't be disabled; the closest thing to chunked output is screen-reader mode, per launch: `CLAUDE_AX_SCREEN_READER=1 CLAUDE_AX_PREPARK_MS=0 claude` (plain text, no borders, batched updates). Docs: code.claude.com/docs/en/settings-reference, /fullscreen, /env-vars.
-- **herdr scrollback by keyboard:** Matt's prefix is **ctrl+a** (config.toml), not the default ctrl+b. PageUp/PageDown scroll the focused pane directly. `ctrl+a [` enters copy mode: j/k lines, ctrl+u/ctrl+d half pages, ctrl+b/ctrl+f pages, `/` search, Esc leaves. `ctrl+a e` opens the scrollback in $EDITOR.
+- **herdr scrollback by keyboard:** the prefix here is **ctrl+a** (set in config.toml), not the default ctrl+b. PageUp/PageDown scroll the focused pane directly. `ctrl+a [` enters copy mode: j/k lines, ctrl+u/ctrl+d half pages, ctrl+b/ctrl+f pages, `/` search, Esc leaves. `ctrl+a e` opens the scrollback in $EDITOR.
 - **Full e-ink refresh from a command:** no documented Onyx API. Candidates found in the system APKs and test-fired via `adb shell am broadcast -a <action>`: `onyx.android.intent.action.REFRESH_SCREEN` (handled by the Notes app, may be note-only) and `action.view.epd.update` (toolbar app). Both deliver without error, including when sent from Termux's own `am`. Whether either produces the toolbar-button GC16 flash was unconfirmed at time of writing. Fallback that always works on e-ink: paint the pane black then white (the AutoHotkey trick), or assign "Refresh" to a Boox swipe gesture in Settings → Gesture management.
 
 ### 5.10 `eink-refresh` (2026-09-08) — confirmed working
-`onyx.android.intent.action.REFRESH_SCREEN` is the toolbar-button full refresh (Matt saw it flash; `action.view.epd.update` was not the one). Any app may send it, including Termux's `am`.
+`onyx.android.intent.action.REFRESH_SCREEN` is the toolbar-button full refresh (confirmed by watching the screen flash; `action.view.epd.update` was not the one). Any app may send it, including Termux's `am`.
 Plumbing: Termux `sshd` on the tablet (port 8022, `PasswordAuthentication no`, laptop `id_ed25519.pub` in Termux `~/.ssh/authorized_keys`, started from `~/.termux/boot/00-open-termux.sh`). Laptop `~/.ssh/config` has `Host note-max` (MagicDNS, port 8022, user = Termux's uid, e.g. `u0_a123`; check with `id` in Termux). The laptop command `eink-refresh` runs `ssh note-max am broadcast -a onyx.android.intent.action.REFRESH_SCREEN`. From inside Claude Code type `!eink-refresh`. Note `am` on the tablet is termux-am and needs the Termux app alive, which the boot script guarantees.
 The same ssh path is a general laptop→tablet channel (scp sketches, `am start`, etc.) that doesn't need USB.
 
@@ -245,14 +245,14 @@ Still to test: does Tailscale come back on its own after a screen-off/on cycle o
 ### 5.12 Termux light theme (2026-09-08)
 `~/.termux/colors.properties` on the Boox: white background, black foreground, dark saturated ANSI colors (red #A00000, green #005A00, blue #0000A8, ...), bright variants only slightly lighter so they survive grayscale. `termux-reload-settings` applies live. Revert by deleting the file and reloading. herdr's own chrome (sidebar, borders) follows herdr's theme on the laptop (`catppuccin`), not Termux's palette; for a light herdr use `name = "catppuccin-latte"` or `auto_switch = true` with `light_name` set, then `herdr server reload-config`.
 
-### 5.13 Batch of 2026-09-08 evening (Matt's picks 1a 2a 3a 4a 6a 8a 9a; 5 dropped; 7 not needed)
+### 5.13 Batch of 2026-09-08 evening
 - **Refresh hotkey:** `ctrl+a f` in herdr runs `eink-refresh` (custom `[[keys.command]]` in herdr config.toml).
 - **FUTO Voice Input** sideloaded from voiceinput.futo.org (`org.futo.voiceinput`), enabled, doze-exempt, IME registered via `adb shell ime enable org.futo.voiceinput/.VoiceInputMethodService`. Model download is a tap inside the app (Wi-Fi).
 - **Sketch loop:** CLAUDE.md and ~/.codex/AGENTS.md now say sketches arrive in `~/Downloads` via Taildrop; "look at my sketch" reads the newest PNG.
 - **Diagram server:** `mmdc` 11.17 installed (`npm i -g @mermaid-js/mermaid-cli`), `~/bin/diagrams` serves `~/diagrams` on the Tailscale IP only, running in herdr tab "diagrams" in the eink-screen workspace. Verified: `http://<laptop-magicdns>:8080/test.svg` returns 200, LAN IP refuses. CLAUDE.md/AGENTS.md instruct agents to render diagrams there. Render: `mmdc -i x.mmd -o ~/diagrams/x.svg -b white`.
 - **Claude Remote Control:** `claude remote-control --name <project>` running in herdr tab "remote-control" in that project's workspace (spawn mode: same-dir). Existing sessions can join with `/remote-control` typed inside them.
-- **Codex remote control:** `remote_control = true` added to ~/.codex/config.toml, but codex 0.153.4 (npm) reports the feature "removed" and `codex remote-control start` demands the native install (`curl -fsSL https://chatgpt.com/codex/install.sh | sh`). Left for Matt to approve.
-- **Laptop awake:** lid-closed on power already works for Matt; caffeinate/Amphetamine not needed.
+- **Codex remote control:** `remote_control = true` added to ~/.codex/config.toml, but codex 0.153.4 (npm) reports the feature "removed" and `codex remote-control start` demands the native install (`curl -fsSL https://chatgpt.com/codex/install.sh | sh`). Left for later; needs a manual install.
+- **Laptop awake:** lid-closed on power already works on this MacBook; caffeinate/Amphetamine not needed.
 
 ### 5.14 App cleanup (2026-09-08)
 Disabled with `adb shell pm disable-user --user 0 <pkg>` (re-enable with `pm enable`): com.onyx.aiassistant, appmarket, easytransfer, mail, musicplayer, voicerecorder, calculator, dict, igetshop. Kept: clock, gallery, floating toolbar (refresh button), reader (kreader), notes.
@@ -295,7 +295,7 @@ Reset by the update: rotation lock (back to auto), **8 of the 10 disabled system
 Working today: `scp <f> note-max:/sdcard/Download/` over Termux sshd. Needed `pm grant com.termux android.permission.{READ,WRITE}_EXTERNAL_STORAGE` + `appops set com.termux LEGACY_STORAGE allow` (Termux targets SDK 28, so the legacy grants give full /sdcard). `termux-setup-storage` did not create `~/storage` symlinks from an ssh session; not needed since /sdcard is directly readable.
 
 ### 5.22 High-contrast herdr chrome on e-ink (2026-09-09)
-Matt runs the Boox in the recommended fast-refresh mode ("deep" color), where mid-grays smear; catppuccin's muted tab bar and sidebar text were unreadable. Fix in the laptop `~/.config/herdr/config.toml` (the `lap` path runs the herdr client on the laptop, so that config governs): `[theme] auto_switch = true`, `dark_name = "catppuccin"`, `light_name = "gruvbox-light"`. herdr queries the host terminal background (OSC 11; Termux answers it), so the tablet gets the light theme while laptop terminals stay catppuccin. Also removed the hard-coded catppuccin `fg = "#cdd6f4"` / `"#a6adc8"` from the `[ui.sidebar.agents]` rows (kept `dim = false`) so row text follows the active theme. Backup: `config.toml.bak-20260909`. `herdr server reload-config` applies it; reattach (`lap`) to see it.
+The Boox is run in the recommended fast-refresh mode ("deep" color), where mid-grays smear; catppuccin's muted tab bar and sidebar text were unreadable. Fix in the laptop `~/.config/herdr/config.toml` (the `lap` path runs the herdr client on the laptop, so that config governs): `[theme] auto_switch = true`, `dark_name = "catppuccin"`, `light_name = "gruvbox-light"`. herdr queries the host terminal background (OSC 11; Termux answers it), so the tablet gets the light theme while laptop terminals stay catppuccin. Also removed the hard-coded catppuccin `fg = "#cdd6f4"` / `"#a6adc8"` from the `[ui.sidebar.agents]` rows (kept `dim = false`) so row text follows the active theme. Backup: `config.toml.bak-20260909`. `herdr server reload-config` applies it; reattach (`lap`) to see it.
 
 Rejected: `light_name = "terminal"` (herdr chrome in the host ANSI palette). It draws the selected tab in ANSI bright white, which `~/.termux/colors.properties` deliberately maps to near-black (#1A1A1A) so bright-white TUI text stays visible on the white background, so the selected tab came out black-on-black. `[theme.custom]` tokens (accent, panel_bg, surface0/1, surface_dim, overlay0/1, text, subtext0, mauve, green, yellow, red, blue, teal, peach) apply to *both* themes, so they can't patch the light side alone. Other built-in light names: catppuccin-latte, one-light, solarized-light, kanagawa-lotus, tokyo-night-day, rose-pine-dawn.
 
@@ -313,7 +313,7 @@ Findings, active use:
 - The Tailscale path is direct, Wi-Fi drain is negligible (1.7 mAh); Tailscale cost is CPU per packet.
 
 Findings, idle:
-- `onyx_dream_refresh` wakeup alarm (com.onyx, 220 wakes/day) redraws the screensaver clock every 5 min. Each wake also runs the keymaster/StrongBox + `secnvm` flash commits (`SPL` log burst of ~124 lines per wake) — that is the keymaster HAL's 32 min CPU. Matt knows; it is the screensaver clock.
+- `onyx_dream_refresh` wakeup alarm (com.onyx, 220 wakes/day) redraws the screensaver clock every 5 min. Each wake also runs the keymaster/StrongBox + `secnvm` flash commits (`SPL` log burst of ~124 lines per wake) — that is the keymaster HAL's 32 min CPU. Known and accepted; it is the screensaver clock. A static screensaver avoids it.
 - Wi-Fi is disconnected 92% of the time (sleep), so Tailscale/ssh are unreachable while the tablet sleeps.
 - Termux wake lock held ~44 min screen-off (the `lap` alias + boot script). Awake time 2h43m total vs 1h36m screen on.
 

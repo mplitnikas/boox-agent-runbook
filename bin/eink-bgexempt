@@ -1,12 +1,13 @@
 #!/bin/bash
-# eink-bgexempt: give Termux, Termux:Boot, Tailscale and the Claude app "full PM access" in the Onyx
+# eink-bgexempt: give Termux, Termux:Boot, Tailscale, the Claude app and the ExKeyMo layout package "full PM access" in the Onyx
 # EAC (per-app optimisation) config. Without it the Onyx freeze sweep force-stops the app 5 min after it
 # leaves the foreground, the Onyx PM module sets Android's background-restricted appop at boot, and
 # PowerManager refuses the app's wake locks. Reads the live config from dumpsys, patches only
-# extraConfig.fullPMAccess=true / fullPMAccessTimeout=-1, and writes it back through the OEC Binder
+# extraConfig.fullPMAccess=true / fullPMAccessTimeout=-1 / autoFreezeConfig.autoFreeze=false (auto-freeze disables the
+# package at boot, which is what dropped the Caps Lock layout selection), and writes it back through the OEC Binder
 # (IOECService.applyAppConfigToService, code 12). Needs adb (USB or tcpip). Runbook 5.26.
 set -u
-PKGS="${EINK_BGEXEMPT_PKGS:-com.termux com.termux.boot com.tailscale.ipn com.anthropic.claude}"
+PKGS="${EINK_BGEXEMPT_PKGS:-com.termux com.termux.boot com.tailscale.ipn com.anthropic.claude ris58h.exkeymo_keyboard_layout}"
 adb get-state >/dev/null 2>&1 || { echo "eink-bgexempt: tablet not on adb"; exit 1; }
 tmp=$(mktemp); trap 'rm -f "$tmp"' EXIT
 adb shell dumpsys oec_service 2>/dev/null | python3 -c '
@@ -18,11 +19,11 @@ todo = []
 for p in pk:
     if p not in cfgs:
         print("  %-34s not in EAC config (not installed, or never launched)" % p, file=sys.stderr); continue
-    d = json.loads(cfgs[p]); e = d.setdefault("extraConfig", {})
-    if e.get("fullPMAccess") is True and e.get("fullPMAccessTimeout") == -1:
+    d = json.loads(cfgs[p]); e = d.setdefault("extraConfig", {}); a = d.setdefault("autoFreezeConfig", {})
+    if e.get("fullPMAccess") is True and e.get("fullPMAccessTimeout") == -1 and a.get("autoFreeze") is False:
         print("  %-34s ok" % p, file=sys.stderr); continue
-    print("  %-34s was fullPMAccess=%s timeout=%s -> fixing" % (p, e.get("fullPMAccess"), e.get("fullPMAccessTimeout")), file=sys.stderr)
-    e["fullPMAccess"] = True; e["fullPMAccessTimeout"] = -1
+    print("  %-34s was fullPMAccess=%s timeout=%s autoFreeze=%s -> fixing" % (p, e.get("fullPMAccess"), e.get("fullPMAccessTimeout"), a.get("autoFreeze")), file=sys.stderr)
+    e["fullPMAccess"] = True; e["fullPMAccessTimeout"] = -1; a["autoFreeze"] = False
     todo.append(json.dumps(d, separators=(",", ":")))
 if todo:
     # List<String> = i32 count + s16 each; trailing "i32 1 i32 0" = non-null empty Bundle (a null Bundle NPEs in the service).
@@ -33,7 +34,7 @@ adb push "$tmp" /data/local/tmp/eink-bgexempt.sh >/dev/null 2>&1 && adb shell sh
 sleep 2
 bad=0
 for p in $PKGS; do
-  adb shell dumpsys oec_service 2>/dev/null | grep -E "^EACAppConfig:$p\{" | grep -q '"fullPMAccess":true,"fullPMAccessTimeout":-1' || { echo "  $p: apply FAILED (check logcat OECService)"; bad=1; }
+  adb shell dumpsys oec_service 2>/dev/null | grep -E "^EACAppConfig:$p\{" | grep '"fullPMAccess":true,"fullPMAccessTimeout":-1' | grep -q '"autoFreeze":false' || { echo "  $p: apply FAILED (check logcat OECService)"; bad=1; }
 done
 [ $bad = 0 ] && echo "  applied; uid background restriction cleared now, wake locks allowed after next reboot"
 exit $bad

@@ -170,7 +170,7 @@ Doze / background-kill exemptions (the generic Android layer; the Onyx-specific 
 ```bash
 for p in com.termux com.tailscale.ipn; do
   adb shell dumpsys deviceidle whitelist +$p
-  adb shell cmd appops set $p RUN_ANY_IN_BACKGROUND allow
+  adb shell cmd appops set --uid $p RUN_ANY_IN_BACKGROUND allow   # --uid matters, see 5.26
 done
 ```
 Wi-Fi was off after first boot; `adb shell svc wifi enable` brought it up and it rejoined the saved network.
@@ -328,3 +328,7 @@ This unit already boots with `ro.boot.verifiedbootstate=orange`, `ro.boot.flash.
 Adb without the cable: `adb tcpip 5555` once over USB per boot, then `adb connect <tablet-ts-ip>:5555` over Tailscale (laptop key already authorized). Only while the tablet is awake; Wi-Fi is off during sleep.
 
 Still GUI-only, to script with the 5.24 uiautomator pattern when needed: Onyx App Startup allowlist and Freeze settings (`am start -a onyx.settings.action.APP_FREEZE_MANAGEMENT`), Taildrop save directory (5.21).
+
+### 5.26 Termux killed a few minutes after backgrounding = Android "background restricted" at the uid level (2026-09-09)
+Symptom: Termux (and its sshd) dies 2-10 min after leaving the foreground even though the package stays `enabled=0`, so it is not the 5.16 freeze. `adb shell logcat -b events -d | grep am_kill` shows `am_kill: [0,<pid>,com.termux,905,cached idle & background restricted]` and `dumpsys activity exit-info com.termux` shows `reason=13 (OTHER KILLS BY SYSTEM)`. Cause: `cmd appops get com.termux` printed `Uid mode: RUN_ANY_IN_BACKGROUND: ignore` above a package-level `RUN_ANY_IN_BACKGROUND: allow`. Android checks the uid mode first, and that is the flag Settings → Battery → "Restricted" (and, apparently, Onyx's power tooling) writes; the 5.1 command without `--uid` only set the package mode. Tailscale had the same uid flag. Fix: `adb shell cmd appops set --uid com.termux RUN_ANY_IN_BACKGROUND allow` (same for com.tailscale.ipn); `eink-check` now checks and re-applies this plus the doze whitelist. Under a restriction, a foreground service does not keep the process out of the cached state, so Termux's "Acquire wakelock" would not have helped either; on this firmware the PowerManager also logs `WakeLock tag:termux:service-wakelock from [com.termux] is forbidden`, so Termux's wake lock is refused outright (Android's own UndimDetector is refused too; Onyx policy, not fixable without root).
+Unknown: what flipped the uid mode. It was only set on the two packages from 5.1, so either the original command never covered it and the 5.16 freeze fix masked the kills for a day, or an Onyx power/optimize path restricts non-system apps. Re-run `eink-check` if it comes back and note the date here.

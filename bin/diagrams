@@ -1,0 +1,5 @@
+#!/bin/bash
+# diagrams: serve ~/diagrams over HTTP on the Tailscale interface only (for the e-ink tablet).
+# URL: http://<laptop-magicdns>:8080/<name>.svg   See eink-screen runbook 1.5.
+TS_IP=$(tailscale ip -4 2>/dev/null) || { echo "tailscale not running" >&2; exit 1; }
+cd ~/diagrams && exec python3 -m http.server 8080 --bind "$TS_IP"

@@ -1,0 +1,627 @@
+{
+ "keymap_db_version": 22,
+ "app_version": 259,
+ "keymap_list": [
+  {
+   "id": 1,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "2b2c4619-5159-4a10-b043-75ec0a046e63"
+     },
+     {
+      "keyCode": 40,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "7eb6e15b-c4e8-42d6-ae89-d4b5f33c2bb5"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.anthropic.claude",
+     "extras": [],
+     "flags": 0,
+     "uid": "c84331f8-176b-4b5a-99cf-03180184d2ec"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.termux"
+      }
+     ],
+     "uid": "e16e04fa-1a64-4462-91e0-0080e0150e4e"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "718176a0-200c-4a12-9140-f73c27f8836a"
+  },
+  {
+   "id": 2,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "053babff-e21f-4cb9-a725-e33551f8e37b"
+     },
+     {
+      "keyCode": 36,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "d581186c-edc6-481a-822e-73897227ed11"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.brave.browser",
+     "extras": [],
+     "flags": 0,
+     "uid": "11ed0b23-457b-45e8-950a-e76718c91197"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.termux"
+      }
+     ],
+     "uid": "75b9fbba-17f3-41ac-8fd2-e8f5a56c1133"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "b36f99ea-2fba-4f02-bb85-1bd196da95d0"
+  },
+  {
+   "id": 3,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "1dfdfde5-39d3-4918-b614-db021c352989"
+     },
+     {
+      "keyCode": 40,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "43328995-2224-4eb5-bf0e-1972bbf5f8d0"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.openai.chatgpt",
+     "extras": [],
+     "flags": 0,
+     "uid": "61818d1b-2163-4a21-83d1-ba2e04af77bf"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.anthropic.claude"
+      }
+     ],
+     "uid": "2e46d70a-41b2-4192-8789-ba00e178a67c"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "f86636c5-6de6-4d4f-89e8-aeb6f28f2929"
+  },
+  {
+   "id": 4,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "24208f77-37f5-47fe-b0f3-81de6ff3c5c9"
+     },
+     {
+      "keyCode": 36,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "ec9b147d-8660-4b2e-9e97-0bf35ccbe130"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.termux",
+     "extras": [],
+     "flags": 0,
+     "uid": "92eedcfc-d034-4678-a944-2895b73e03e5"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.anthropic.claude"
+      }
+     ],
+     "uid": "3c104afa-f09a-4df7-8ce7-443b332e30cd"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "d06107c7-ce27-4e91-a097-f707b25a7f34"
+  },
+  {
+   "id": 5,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "d703716d-8dc3-465b-bb34-be4b88a1854f"
+     },
+     {
+      "keyCode": 40,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "ac31982b-c2c3-42ae-ad33-d5a3721afa83"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.brave.browser",
+     "extras": [],
+     "flags": 0,
+     "uid": "c00b896b-9d7c-4c8c-b515-b8e7175b3b3b"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.openai.chatgpt"
+      }
+     ],
+     "uid": "106be767-da21-4415-9556-08739cceffb9"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "7e0edf08-a217-494f-8ed0-cd07a9748c0f"
+  },
+  {
+   "id": 6,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "1295bfad-e7a3-4276-ada8-15c6d3e4d61f"
+     },
+     {
+      "keyCode": 36,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "d7bc6009-9466-4b8a-9918-d6a9ed9ec2ce"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.anthropic.claude",
+     "extras": [],
+     "flags": 0,
+     "uid": "36b1cb5a-bebe-49b9-8113-4d1cc8eb94e7"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.openai.chatgpt"
+      }
+     ],
+     "uid": "bcf32039-4b98-4b65-8c9b-8cf96c3ad829"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "47e1f28b-219d-4f31-a244-96cc0c3f53b3"
+  },
+  {
+   "id": 7,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "392e50d2-61e1-444d-a24e-e95fa4d10d9e"
+     },
+     {
+      "keyCode": 40,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "7985461a-b81b-4a85-b7fe-8d7fef804a1e"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.termux",
+     "extras": [],
+     "flags": 0,
+     "uid": "48b49ad5-1cf2-4ac4-8767-f5165722c443"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.brave.browser"
+      }
+     ],
+     "uid": "e4a9e125-83a2-4fd2-b0d1-48b26d42fabc"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "b9921edc-6011-437e-ac8b-6335e9e1db31"
+  },
+  {
+   "id": 8,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "bb18e648-fd2d-403b-b2d1-185b23e43900"
+     },
+     {
+      "keyCode": 36,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "2db68d9e-513a-4c31-802e-cff898fd91b5"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.openai.chatgpt",
+     "extras": [],
+     "flags": 0,
+     "uid": "36387b4c-438f-4bd2-93b9-349759f90204"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.brave.browser"
+      }
+     ],
+     "uid": "52d5c9ad-4c46-45aa-85bd-b0bfefdcc494"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "0aceb4eb-cf55-43e5-bf23-6e05d4b2e2de"
+  },
+  {
+   "id": 9,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "969d0540-4998-4b9b-af91-15c2a2403cd9"
+     },
+     {
+      "keyCode": 40,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "bf9f7f51-b65f-4af0-a02f-2b8c0b8d3c1f"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.termux",
+     "extras": [],
+     "flags": 0,
+     "uid": "8fe29c02-37bd-410e-9414-0e9a6623a05c"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.onyx"
+      }
+     ],
+     "uid": "1456cfba-2b49-41f0-8111-314a2c420c9c"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "8d91023a-6937-4168-83bf-fc543796e956"
+  },
+  {
+   "id": 10,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "dfd65fcf-d2e4-4bdc-9965-9d6ca45c0fc4"
+     },
+     {
+      "keyCode": 36,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "34160e35-61c5-4bb1-860c-c43c5b8f5406"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "APP",
+     "data": "com.brave.browser",
+     "extras": [],
+     "flags": 0,
+     "uid": "8841a72f-1793-4cc3-808a-8e1b2dc01aa1"
+    }
+   ],
+   "constraintList": [
+    {
+     "type": "constraint_app_foreground",
+     "extras": [
+      {
+       "id": "extra_package_name",
+       "data": "com.onyx"
+      }
+     ],
+     "uid": "5b098024-8214-4507-b8a9-58b3b2276574"
+    }
+   ],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "e9daff67-5890-49eb-a329-bf45df559106"
+  },
+  {
+   "id": 11,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "a17fee63-9f1b-47ee-b0c3-82d5237d1ffb"
+     },
+     {
+      "keyCode": 39,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "e0f32210-d733-4c21-b071-8c3e4b5aa0ec"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "SYSTEM_ACTION",
+     "data": "open_recents",
+     "extras": [],
+     "flags": 0,
+     "uid": "b03cf60c-ce3a-4cdb-8549-a8f5724821a4"
+    }
+   ],
+   "constraintList": [],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "a941e3f2-7ddf-40e5-9873-a52fa0f3578f"
+  },
+  {
+   "id": 12,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "0d549cf6-e3b5-4fca-9a15-a1e7e02f33b8"
+     },
+     {
+      "keyCode": 38,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "d240731d-e32c-416f-8835-04d5d62ff4d5"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "SYSTEM_ACTION",
+     "data": "go_home",
+     "extras": [],
+     "flags": 0,
+     "uid": "0445f551-95b8-48a9-996e-dc6e7b9c8b8c"
+    }
+   ],
+   "constraintList": [],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "960caba2-9869-4b0a-ab30-bb6cadcba40b"
+  },
+  {
+   "id": 13,
+   "trigger": {
+    "keys": [
+     {
+      "keyCode": 57,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "77929f56-9d13-4a30-b231-f239aa9f4810"
+     },
+     {
+      "keyCode": 49,
+      "deviceId": "io.github.sds100.keymapper.ANY_DEVICE",
+      "clickType": 0,
+      "flags": 0,
+      "uid": "a543a7f7-7aac-49d9-9c8d-4cab9c48534a"
+     }
+    ],
+    "extras": [],
+    "mode": 0,
+    "flags": 0
+   },
+   "actionList": [
+    {
+     "type": "SYSTEM_ACTION",
+     "data": "open_recents",
+     "extras": [
+      {
+       "id": "extra_delay_before_next_action",
+       "data": "400"
+      }
+     ],
+     "flags": 0,
+     "uid": "645ce488-4519-4b0c-86a3-294702af8dd0"
+    },
+    {
+     "type": "TAP_COORDINATE",
+     "data": "1600,592",
+     "extras": [
+      {
+       "id": "extra_coordinate_description",
+       "data": "2nd recents tile (previous app)"
+      }
+     ],
+     "flags": 0,
+     "uid": "020f3b3d-e09e-4361-80a3-767fa3a4370e"
+    }
+   ],
+   "constraintList": [],
+   "constraintMode": 1,
+   "flags": 0,
+   "isEnabled": true,
+   "uid": "c0533455-f546-41ac-a040-b905b341f92e"
+  }
+ ]
+}

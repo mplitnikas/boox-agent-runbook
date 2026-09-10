@@ -1,0 +1,89 @@
+#!/bin/bash
+# eink-screen: re-apply the Caps Lock -> Ctrl keyboard layout (ExKeyMo) on the Boox.
+# Why: the Boox flips the sideloaded layout package to disabled (enabled=3); Android then drops the
+# per-device layout selection (/data/system/input-manager-state.xml, system-only, no adb API on
+# Android 13) and does not restore it when the package is re-enabled. Only route without root is
+# the AOSP Settings UI, driven here with uiautomator by text, not fixed coordinates.
+# Screens: Physical keyboard page (row per keyboard, summary = current layout)
+#   -> tap row -> "Choose keyboard layout" dialog: enabled layouts (or "Default" when none) + "Set up keyboard layouts"
+#   -> setup picker: long alphabetical list of CheckBox rows (scrolls) -> tick the layout -> back -> it is current.
+# Tablet on USB. ~5-20 s of screen. EINK_LAYOUT="English (US)" selects another enabled layout (test);
+# EINK_UNTICK=1 unticks the layout in the picker instead (test only, reproduces the reverted state).
+set -u
+PKG=ris58h.exkeymo_keyboard_layout
+KBD="${EINK_KBD:-Targus Folding Ergonomic Bluetooth Keyboard}"
+LAYOUT="${EINK_LAYOUT:-ExKeyMo}"
+T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
+N=0
+dump() { sleep "${1:-1.5}"; adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb pull /sdcard/ui.xml "$T/ui.xml" >/dev/null 2>&1
+  if [ -n "${EINK_DEBUG:-}" ]; then N=$((N+1)); cp "$T/ui.xml" "$EINK_DEBUG/dump$N.xml"; echo "[dump$N] $(python3 -c "
+import sys,xml.etree.ElementTree as ET;print(' | '.join((n.get('text') or '')[:30] for n in ET.parse(sys.argv[1]).iter('node') if n.get('text')))" "$T/ui.xml" | cut -c1-300)"; fi; }
+# q summary <kbd> | center <text> | present <text> | checkbox <text>  (checkbox -> "cx cy checked")
+q() { python3 - "$T/ui.xml" "$@" <<'PY'
+import sys,re,xml.etree.ElementTree as ET
+f,mode,arg=sys.argv[1:]
+nodes=list(ET.parse(f).iter('node'))
+txt=lambda n:(n.get('text') or '')
+box=lambda n:list(map(int,re.findall(r'\d+',n.get('bounds'))))
+if mode=='summary':
+    for i,n in enumerate(nodes):
+        if txt(n)==arg:
+            for m in nodes[i+1:i+4]:
+                if 'summary' in (m.get('resource-id') or ''): print(txt(m)); sys.exit()
+elif mode=='center':
+    for n in nodes:
+        if arg in txt(n) and n.get('resource-id')!='android:id/summary':
+            x1,y1,x2,y2=box(n); print((x1+x2)//2,(y1+y2)//2); sys.exit()
+elif mode=='present':
+    print(any(arg in txt(n) for n in nodes))
+elif mode=='checkbox':
+    for n in nodes:
+        if arg in txt(n):
+            _,y1,_,y2=box(n)
+            for c in nodes:
+                if c.get('class') in ('android.widget.CheckBox','android.widget.Switch'):
+                    _,cy1,_,cy2=box(c)
+                    if cy1<=y2 and cy2>=y1:
+                        x1,a,x2,b=box(c); print((x1+x2)//2,(a+b)//2,c.get('checked')); sys.exit()
+PY
+}
+tap() { adb shell input tap $1; }
+back() { adb shell input keyevent KEYCODE_BACK; }
+onpage()  { [ "$(q present 'Keyboard assistance')" = True ]; }
+inchooser(){ [ "$(q present 'Choose keyboard layout')" = True ]; }
+inpicker() { [ "$(q present 'Keyboard layouts')" = True ] && ! inchooser; }
+
+adb shell pm enable --user 0 $PKG >/dev/null; adb shell pm enable --user 0 $PKG >/dev/null
+adb shell am start --activity-clear-task -a android.settings.HARD_KEYBOARD_SETTINGS >/dev/null 2>&1
+dump 2; before=$(q summary "$KBD"); echo "layout before: ${before:-?}"
+[ -z "$before" ] && { echo "keyboard '$KBD' not listed (not connected?)"; back; exit 1; }
+if [ -z "${EINK_UNTICK:-}" ] && [[ "$before" == *"$LAYOUT"* ]]; then echo "already set"; back; exit 0; fi
+
+for step in 1 2 3 4 5 6 7 8; do
+  if onpage; then
+    cur=$(q summary "$KBD")
+    if [ -z "${EINK_UNTICK:-}" ] && [[ "$cur" == *"$LAYOUT"* ]]; then echo "layout after:  $cur"; back; exit 0; fi
+    [ "$step" -gt 6 ] && break
+    tap "$(q center "$KBD")"; dump; continue
+  fi
+  if inchooser; then
+    item=$(q center "$LAYOUT")
+    if [ -n "$item" ] && [ -z "${EINK_UNTICK:-}" ]; then tap "$item"; dump; continue; fi
+    tap "$(q center 'Set up keyboard layouts')"; dump; continue
+  fi
+  if inpicker; then
+    for scroll in 1 2 3 4 5 6 7 8 9 10 11 12; do
+      cb=$(q checkbox "$LAYOUT"); [ -n "$cb" ] && break
+      adb shell input swipe 1600 1900 1600 700 300; dump 0.8
+    done
+    [ -z "$cb" ] && { echo "'$LAYOUT' not in picker (package disabled?)"; back; back; exit 1; }
+    set -- $cb
+    if [ -n "${EINK_UNTICK:-}" ]; then
+      [ "$3" = true ] && tap "$1 $2"; echo "unticked $LAYOUT"; back; dump; back; exit 0
+    fi
+    [ "$3" = false ] && tap "$1 $2"
+    back; dump; continue
+  fi
+  echo "unknown screen at step $step"; back; back; exit 1
+done
+echo "gave up; layout now: $(q summary "$KBD")"; back; exit 1

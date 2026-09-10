@@ -1,0 +1,44 @@
+#!/bin/bash
+# eink-check: re-apply the Boox Note Max state that firmware updates / freezes / force-stops keep undoing.
+# Needs the tablet on USB with adb authorised. Safe to run repeatedly. See eink-screen runbook 5.20.
+set -u
+adb get-state >/dev/null 2>&1 || { echo "eink-check: tablet not on adb (USB)"; exit 1; }
+say() { printf '  %-34s %s\n' "$1" "$2"; }
+
+echo "packages that must stay enabled"
+for p in com.termux com.termux.boot com.tailscale.ipn com.anthropic.claude io.github.sds100.keymapper ris58h.exkeymo_keyboard_layout org.futo.voiceinput; do
+  st=$(adb shell dumpsys package "$p" 2>/dev/null | grep -E 'User 0:' | grep -oE 'enabled=[0-9]' | cut -d= -f2)
+  case "$st" in 0|1) say "$p" "ok";; "") say "$p" "NOT INSTALLED";; *) adb shell pm enable --user 0 "$p" >/dev/null 2>&1; say "$p" "was enabled=$st -> re-enabled";; esac
+done
+
+echo "bloat that must stay disabled"
+for p in com.onyx.aiassistant com.onyx.appmarket com.onyx.easytransfer com.onyx.mail com.onyx.musicplayer com.onyx.voicerecorder com.onyx.calculator com.onyx.dict com.onyx.igetshop org.chromium.chrome; do
+  if adb shell pm list packages -d 2>/dev/null | grep -q "^package:$p\r\?$"; then say "$p" "ok"; else adb shell pm disable-user --user 0 "$p" >/dev/null 2>&1; say "$p" "re-disabled"; fi
+done
+
+echo "settings"
+fix() { # scope key want
+  cur=$(adb shell settings get "$1" "$2" 2>/dev/null | tr -d '\r')
+  if [ "$cur" = "$3" ]; then say "$1 $2" "ok ($cur)"; else adb shell settings put "$1" "$2" "$3" >/dev/null 2>&1; say "$1 $2" "was '$cur' -> $3"; fi
+}
+fix system accelerometer_rotation 0
+fix system user_rotation 1
+fix global stay_on_while_plugged_in 7
+fix global wifi_on_when_device_boot 1
+fix global bt_on_when_device_boot 1
+fix global window_animation_scale 0
+fix global transition_animation_scale 0
+fix global animator_duration_scale 0
+fix secure always_on_vpn_app com.tailscale.ipn
+# accessibility: Onyx toolbar + Key Mapper, and no floating accessibility ball
+want="com.onyx.floatingbutton/com.onyx.floatingbutton.service.FloatButtonAccessibilityService:io.github.sds100.keymapper/.system.accessibility.MyAccessibilityService"
+cur=$(adb shell settings get secure enabled_accessibility_services 2>/dev/null | tr -d '\r')
+if echo "$cur" | grep -q keymapper; then say "accessibility services" "ok"; else adb shell settings put secure enabled_accessibility_services "$want" >/dev/null; adb shell settings put secure accessibility_enabled 1 >/dev/null; say "accessibility services" "Key Mapper re-registered"; fi
+bt=$(adb shell settings get secure accessibility_button_targets 2>/dev/null | tr -d '\r')
+if [ -z "$bt" ] || [ "$bt" = "null" ]; then say "accessibility ball" "ok (none)"; else adb shell settings delete secure accessibility_button_targets >/dev/null; say "accessibility ball" "removed"; fi
+
+echo "manual (GUI only) if anything above changed:"
+# Caps Lock -> Ctrl layout: no adb API; ~/bin/eink-capslock drives the Settings UI via uiautomator (takes the screen ~5-20 s).
+if [ -n "${EINK_SKIP_CAPSLOCK:-}" ]; then echo "  - Caps Lock layout: skipped (EINK_SKIP_CAPSLOCK set); run ~/bin/eink-capslock later"
+else echo "  - Caps Lock layout:"; ~/bin/eink-capslock 2>&1 | sed 's/^/      /'; fi
+echo "  - App Startup allowlist + Freeze settings: Settings > Apps & Notifications"

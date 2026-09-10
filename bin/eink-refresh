@@ -1,0 +1,5 @@
+#!/bin/bash
+# eink-refresh: force a full GC16 refresh on the Boox Note Max (same as the toolbar refresh button).
+# Sends the Onyx broadcast via Termux sshd on the tablet over Tailscale. See eink-screen runbook 5.10.
+ssh -o BatchMode=yes note-max "am broadcast -a onyx.android.intent.action.REFRESH_SCREEN" >/dev/null 2>&1 \
+  || { echo "eink-refresh: could not reach note-max (tablet asleep, Tailscale down, or Termux not running)" >&2; exit 1; }

@@ -1,0 +1,39 @@
+#!/bin/bash
+# eink-bgexempt: give Termux, Termux:Boot, Tailscale and the Claude app "full PM access" in the Onyx
+# EAC (per-app optimisation) config. Without it the Onyx freeze sweep force-stops the app 5 min after it
+# leaves the foreground, the Onyx PM module sets Android's background-restricted appop at boot, and
+# PowerManager refuses the app's wake locks. Reads the live config from dumpsys, patches only
+# extraConfig.fullPMAccess=true / fullPMAccessTimeout=-1, and writes it back through the OEC Binder
+# (IOECService.applyAppConfigToService, code 12). Needs adb (USB or tcpip). Runbook 5.26.
+set -u
+PKGS="${EINK_BGEXEMPT_PKGS:-com.termux com.termux.boot com.tailscale.ipn com.anthropic.claude}"
+adb get-state >/dev/null 2>&1 || { echo "eink-bgexempt: tablet not on adb"; exit 1; }
+tmp=$(mktemp); trap 'rm -f "$tmp"' EXIT
+adb shell dumpsys oec_service 2>/dev/null | python3 -c '
+import sys, json, re
+pk = sys.argv[1].split()
+s = sys.stdin.read()
+cfgs = {m.group(1): m.group(2) for m in re.finditer(r"EACAppConfig:(\S+?)(\{.*)", s)}
+todo = []
+for p in pk:
+    if p not in cfgs:
+        print("  %-34s not in EAC config (not installed, or never launched)" % p, file=sys.stderr); continue
+    d = json.loads(cfgs[p]); e = d.setdefault("extraConfig", {})
+    if e.get("fullPMAccess") is True and e.get("fullPMAccessTimeout") == -1:
+        print("  %-34s ok" % p, file=sys.stderr); continue
+    print("  %-34s was fullPMAccess=%s timeout=%s -> fixing" % (p, e.get("fullPMAccess"), e.get("fullPMAccessTimeout")), file=sys.stderr)
+    e["fullPMAccess"] = True; e["fullPMAccessTimeout"] = -1
+    todo.append(json.dumps(d, separators=(",", ":")))
+if todo:
+    # List<String> = i32 count + s16 each; trailing "i32 1 i32 0" = non-null empty Bundle (a null Bundle NPEs in the service).
+    print("service call oec_service 12 i32 %d %s i32 1 i32 0" % (len(todo), " ".join("s16 \x27%s\x27" % j for j in todo)))
+' "$PKGS" > "$tmp"
+[ -s "$tmp" ] || exit 0
+adb push "$tmp" /data/local/tmp/eink-bgexempt.sh >/dev/null 2>&1 && adb shell sh /data/local/tmp/eink-bgexempt.sh >/dev/null 2>&1
+sleep 2
+bad=0
+for p in $PKGS; do
+  adb shell dumpsys oec_service 2>/dev/null | grep -E "^EACAppConfig:$p\{" | grep -q '"fullPMAccess":true,"fullPMAccessTimeout":-1' || { echo "  $p: apply FAILED (check logcat OECService)"; bad=1; }
+done
+[ $bad = 0 ] && echo "  applied; uid background restriction cleared now, wake locks allowed after next reboot"
+exit $bad

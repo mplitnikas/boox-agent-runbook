@@ -37,6 +37,9 @@ if echo "$cur" | grep -q keymapper; then say "accessibility services" "ok"; else
 bt=$(adb shell settings get secure accessibility_button_targets 2>/dev/null | tr -d '\r')
 if [ -z "$bt" ] || [ "$bt" = "null" ]; then say "accessibility ball" "ok (none)"; else adb shell settings delete secure accessibility_button_targets >/dev/null; say "accessibility ball" "removed"; fi
 
+echo "Onyx full-PM-access exemptions (freeze sweep / bg restriction / wake locks, runbook 5.26)"
+~/bin/eink-bgexempt
+
 echo "background-kill exemptions (uid level; Settings > Battery 'Restricted' / Onyx power tools flip these, see runbook 5.26)"
 for p in com.termux com.tailscale.ipn; do
   if adb shell cmd appops get "$p" 2>/dev/null | grep -qE 'Uid mode: RUN_ANY_IN_BACKGROUND: (ignore|deny)'; then

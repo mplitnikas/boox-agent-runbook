@@ -15,6 +15,7 @@ recent Boox models (same Onyx firmware quirks); the coordinates in a few scripts
   root assessment.
 - **`bin/`** — computer-side helper scripts referenced in the runbook (copy to `~/bin`):
   - `eink-check` — re-applies every adb-fixable tablet setting after a firmware update or a freeze. Idempotent.
+  - `eink-bgexempt` — gives Termux, Tailscale and the Claude app Onyx "full PM access" so the freeze sweep, boot-time background restriction and wake-lock ban leave them alone (runbook 5.26). Called by `eink-check`.
   - `eink-capslock` — re-selects the Caps Lock→Ctrl keyboard layout by driving the AOSP Settings UI
     with `uiautomator dump` and taps by text (no fixed coordinates). Reusable pattern for any GUI-only setting.
   - `eink-refresh` — forces a full e-ink (GC16) refresh over ssh via the Onyx `REFRESH_SCREEN` broadcast.

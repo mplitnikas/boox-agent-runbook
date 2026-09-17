@@ -25,6 +25,10 @@ You already have Tailscale, so no port-forwarding or public keys on the internet
 
 ### 1.3 herdr (persistent sessions)
 Install per https://herdr.dev (single binary; `cargo install herdr` or the release tarball). Don't run it inside tmux — it replaces tmux.
+
+Install method on the laptop (2026-09-17): the prebuilt `herdr-macos-aarch64` release binary in `~/.local/bin/herdr`, updated with `herdr update`. The Homebrew formula is pinned and unlinked, not removed: Homebrew ships no bottle for macOS 14, so `brew upgrade herdr` builds from source and starts by compiling `llvm@22` (hours), and it unlinks the old binary for the whole build. Don't use brew for herdr on this machine.
+
+Sidebar status on e-ink: `[ui] status_indicators = "symbols"` (herdr ≥ 0.9) marks agent state by shape as well as color, so blocked/working/done are readable in grayscale.
 ```bash
 herdr                        # first run: onboarding, then a default session
 # ctrl+b n   new workspace (one per repo)

@@ -361,3 +361,13 @@ Fix, laptop side, two parts:
 2. `~/.codex/config.toml`: `[tui] animations = false` and `whimsy = false`. `whimsy = false` drops the braille stars; `animations = false` drops them *and* the braille spinner Codex writes into the terminal title (measured: OSC 0 title writes over a 10 s idle boot fell from ~14 to 1). Both matter for the repaint rate in 5.23 — the title animation is what herdr renders into the sidebar row.
 
 Evidence level: driven in a pty with a fake host terminal and, end to end, inside an isolated herdr whose host answer was forced dark — with both fixes in place the composer came back with no fill and no braille. Confirmed on the tablet 2026-09-12 after restarting the pane (`/quit`, `exec zsh` so the new shell function is in scope, `codex resume --last`).
+
+### 5.28 `eink-open`: send links and files to the tablet (2026-09-23)
+`eink-open <url|file>...` on the laptop. A URL opens in the tablet's default browser. A local file is copied to `/sdcard/Download/` (the 5.21 scp route). You can mix several of each in one call. It works through Remote Control too: ask the agent to "send this to the tablet".
+
+- **Links:** `ssh note-max '/system/bin/am start -a android.intent.action.VIEW -d <url>'`. It prints nothing on success. Termux's own `am` (termux-am) crashes here with an AppOps `NullPointerException` from `SyncNotedAppOp` on Android 13, and the termux-am socket server does not exist in this Termux build. `am broadcast` through termux-am (5.10) still works; only `am start` fails.
+- **PDF links:** Brave on Android, like other Chromium browsers there, has no built-in PDF viewer, so it downloads the file to Download/. The download notification then opens it in NeoReader. For a PDF, a link and a file send end the same way.
+- Every `am start` takes over the tablet screen. Do not send test URLs while Matt is using the tablet.
+- Taildrop laptop → tablet still stalls (2026-09-23: about 570 KB in, while Tailscale was up and `tailscale ping` answered). 5.21 is still open. Tailscale runs as a VPN service and does not show in Recents, so "not in the open apps list" does not mean it is down. Check with `tailscale ping note-max`.
+
+Evidence: the file branch was run with a filename that has a space in it, and the file was read back on the tablet. The URL command was run by hand, and the PDF link downloaded in Brave. The script's own URL branch (`printf %q` quoting) has not been run against the tablet yet: **unproven**.

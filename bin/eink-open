@@ -1,0 +1,29 @@
+#!/bin/bash
+# eink-open: send links and files to the Boox Note Max. See eink-screen runbook 5.28.
+#   eink-open <url>   open it in the tablet's default browser (PDF links download to Download/)
+#   eink-open <file>  copy it into the tablet's Download/ folder
+# Takes several arguments; each one is a URL or a local file. Goes over Termux sshd via Tailscale.
+# Uses /system/bin/am: Termux's own `am` crashes on Android 13 (AppOps NullPointerException).
+[ $# -gt 0 ] || { echo "usage: eink-open <url|file>..." >&2; exit 2; }
+ssh -o BatchMode=yes -o ConnectTimeout=10 note-max true 2>/dev/null \
+  || { echo "eink-open: could not reach note-max (tablet asleep, Tailscale down, or Termux not running)" >&2; exit 1; }
+rc=0
+for a in "$@"; do
+  if [ -f "$a" ]; then
+    if scp -q -o BatchMode=yes -- "$a" note-max:/sdcard/Download/; then
+      echo "copied: Download/$(basename -- "$a")"
+    else
+      echo "eink-open: copy failed: $a" >&2; rc=1
+    fi
+  elif [[ "$a" =~ ^[a-zA-Z][a-zA-Z0-9+.-]*:// ]]; then
+    q=$(printf %q "$a")
+    if ssh -o BatchMode=yes note-max "/system/bin/am start -a android.intent.action.VIEW -d $q" >/dev/null; then
+      echo "opened: $a"
+    else
+      echo "eink-open: could not open: $a" >&2; rc=1
+    fi
+  else
+    echo "eink-open: not a file or URL: $a" >&2; rc=1
+  fi
+done
+exit $rc
